@@ -42,10 +42,10 @@ const Services = () => {
     <section
       id="services"
       ref={ref}
-      className="h-screen bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white"
+      className="h-auto bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white py-16"
     >
-      <div className="container mx-auto px-6 h-full flex flex-col justify-center">
-        <h2 className="text-5xl font-extrabold text-center mb-12">What I Do</h2>
+      <div className="container mx-auto px-6 flex flex-col justify-center">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12">What I Do</h2>
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
           initial={{ opacity: 0, y: 50, scale: 0.9, rotate: -5 }}
@@ -55,18 +55,18 @@ const Services = () => {
           {services.map((service, index) => (
             <motion.div
               key={index}
-              className="bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 text-white shadow-2xl rounded-3xl p-8 text-center transform hover:scale-110 hover:shadow-xl transition duration-300"
+              className="bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600 text-white shadow-2xl rounded-3xl p-6 md:p-8 text-center transform hover:scale-110 hover:shadow-xl transition duration-300"
               whileHover={{ rotate: 10, scale: 1.1 }}
             >
               <motion.div
-                className="text-6xl mb-4 text-yellow-400"
+                className="text-5xl md:text-6xl mb-4 text-yellow-400"
                 animate={{ scale: [1, 1.3, 1], rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
                 {service.icon}
               </motion.div>
-              <h3 className="text-3xl font-bold mb-3">{service.title}</h3>
-              <p className="text-gray-300">{service.description}</p>
+              <h3 className="text-2xl md:text-3xl font-bold mb-3">{service.title}</h3>
+              <p className="text-gray-300 text-sm md:text-base">{service.description}</p>
             </motion.div>
           ))}
         </motion.div>

@@ -51,10 +51,10 @@ const Portfolio = () => {
     <section
       id="portfolio"
       ref={ref}
-      className="h-screen w-screen bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 text-white"
+      className="min-h-screen w-full bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 text-white py-16"
     >
-      <div className="container mx-auto px-6 h-full flex flex-col justify-center">
-        <h2 className="text-5xl font-extrabold text-center mb-12">My Work</h2>
+      <div className="container mx-auto px-6 flex flex-col justify-center">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-center mb-12">My Work</h2>
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
           variants={containerVariants}
@@ -80,11 +80,11 @@ const Portfolio = () => {
                   <img
                     src={project.image}
                     alt={project.title}
-                    className="w-full h-60 object-cover rounded-t-3xl hover:opacity-90"
+                    className="w-full h-48 md:h-60 object-cover rounded-t-3xl hover:opacity-90"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
                   <motion.h3
-                    className="absolute bottom-4 left-4 text-3xl font-bold text-white"
+                    className="absolute bottom-4 left-4 text-2xl md:text-3xl font-bold text-white"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
@@ -92,8 +92,8 @@ const Portfolio = () => {
                     {project.title}
                   </motion.h3>
                 </div>
-                <div className="p-6 relative">
-                  <p className="text-gray-300 mb-4">{project.description}</p>
+                <div className="p-4 md:p-6 relative">
+                  <p className="text-gray-300 text-sm md:text-base mb-4">{project.description}</p>
                   <a
                     href={project.link}
                     className="text-yellow-400 font-semibold hover:underline hover:text-yellow-300"
@@ -101,7 +101,7 @@ const Portfolio = () => {
                     View Details
                   </a>
                   <motion.div
-                    className="absolute top-4 right-4 w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-yellow-500/50"
+                    className="absolute top-4 right-4 w-8 md:w-10 h-8 md:h-10 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg hover:shadow-yellow-500/50"
                     whileHover={{ scale: 1.3, rotate: 360 }}
                   >
                     <span className="text-black font-bold">+</span>
@@ -123,5 +123,3 @@ const Portfolio = () => {
 };
 
 export default Portfolio;
-
-
