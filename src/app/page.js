@@ -1,15 +1,16 @@
 import Navbar from "./components/Navbar";
 import HomeSection from "./components/HomeSection";
+import Services from "./components/ServicesSection";
+import Portfolio from "./components/PortfolioSection";
+import CallToAction from "./components/CallToAction";
 
 export default function Home() {
   return (
     <div>
       <HomeSection/>
-      <main className="min-h-screen flex items-center justify-center">
-        <h1 className="text-2xl font-bold">
-          Welcome to My Portfolio!
-        </h1>
-      </main>
-    </div>
+      <Services/>
+      <Portfolio/>
+      <CallToAction/>
+      </div>
   );
 }
