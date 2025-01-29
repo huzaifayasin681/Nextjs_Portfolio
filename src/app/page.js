@@ -1,4 +1,3 @@
-import Navbar from "./components/Navbar";
 import HomeSection from "./components/HomeSection";
 import Services from "./components/ServicesSection";
 import Portfolio from "./components/PortfolioSection";
