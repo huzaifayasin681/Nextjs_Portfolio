@@ -31,9 +31,9 @@ const Contact = () => {
     }
 
     // EmailJS service configuration
-    const serviceID = 'YOUR_SERVICE_ID';
-    const templateID = 'YOUR_TEMPLATE_ID';
-    const publicKey = 'YOUR_PUBLIC_KEY';
+    const serviceID = 'service_ga194k4';
+    const templateID = 'template_c60drrh';
+    const publicKey = '9C0d12Bv9KHG4FTt6';
 
     try {
       await emailjs.send(
