@@ -1,192 +1,150 @@
 "use client";
-import { motion } from "framer-motion";
-import { FiGithub, FiExternalLink, FiStar, FiFolder, FiGitBranch } from "react-icons/fi";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { FiArrowLeft, FiArrowUpRight, FiGithub, FiSearch, FiStar } from "react-icons/fi";
+import { profile } from "@/data/site";
 
-const Projects = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [hasMounted, setHasMounted] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+const USER = "huzaifayasin681";
 
-  const fetchProjects = async (pageNumber) => {
-    try {
-      const response = await fetch(
-        `https://api.github.com/users/huzaifayasin681/repos?sort=updated&direction=desc&page=${pageNumber}&per_page=6`
-      );
-      const data = await response.json();
-      
-      if (data.length === 0) {
-        setHasMore(false);
-        return;
-      }
+function timeAgo(iso) {
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if (days < 1) return "today";
+  if (days < 30) return `${days}d ago`;
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+  return `${Math.floor(days / 365)}y ago`;
+}
 
-      setProjects(prev => [...prev, ...data]);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      setLoading(false);
-    }
-  };
+export default function ProjectsArchive() {
+  const [repos, setRepos] = useState([]);
+  const [status, setStatus] = useState("loading");
+  const [query, setQuery] = useState("");
+  const [lang, setLang] = useState("All");
 
   useEffect(() => {
-    setHasMounted(true);
-    fetchProjects(page);
-  }, [page]);
+    let alive = true;
+    fetch(`https://api.github.com/users/${USER}/repos?per_page=100&sort=pushed`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((data) => {
+        if (!alive) return;
+        setRepos(data.filter((r) => !r.fork && r.name !== USER));
+        setStatus("ready");
+      })
+      .catch(() => alive && setStatus("error"));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
-  const fadeIn = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.5 } },
-  };
+  const languages = useMemo(() => {
+    const set = new Set(repos.map((r) => r.language).filter(Boolean));
+    return ["All", ...Array.from(set).sort()];
+  }, [repos]);
 
-  const stagger = {
-    visible: { transition: { staggerChildren: 0.1 } },
-  };
-
-  const cardAnimation = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 },
-  };
-
-  if (!hasMounted) {
-    return null;
-  }
+  const filtered = repos.filter((r) => {
+    const q = query.toLowerCase();
+    const matchesQuery = !q || r.name.toLowerCase().includes(q) || (r.description || "").toLowerCase().includes(q);
+    const matchesLang = lang === "All" || r.language === lang;
+    return matchesQuery && matchesLang;
+  });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial="hidden"
-          animate={hasMounted ? "visible" : "hidden"}
-          variants={fadeIn}
-          className="text-center mb-16"
-        >
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-4">
-            My Projects
-          </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Explore my latest coding endeavors. From web apps to open-source contributions, 
-            each project tells a story of problem-solving and innovation.
-          </p>
-        </motion.div>
+    <section className="pb-24 pt-32 md:pt-40">
+      <div className="container-site">
+        <Link href="/#work" className="inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-white">
+          <FiArrowLeft /> Back to home
+        </Link>
+        <p className="eyebrow mt-8">Archive</p>
+        <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white md:text-5xl">All repositories</h1>
+        <p className="mt-4 max-w-2xl text-zinc-400">
+          Everything public on my GitHub, pulled live and sorted by most recent activity.
+        </p>
 
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3, 4, 5, 6].map((skeleton) => (
-              <div
-                key={skeleton}
-                className="h-64 bg-gray-800 rounded-xl animate-pulse"
-              />
+        <div className="mt-10 flex flex-col gap-4 md:flex-row md:items-center">
+          <label className="relative flex-1">
+            <FiSearch className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" />
+            <input
+              className="field pl-11"
+              placeholder="Search repositories"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Search repositories"
+            />
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {languages.map((l) => (
+              <button
+                key={l}
+                onClick={() => setLang(l)}
+                className={`rounded-full border px-3 py-1.5 text-xs transition ${
+                  lang === l ? "border-accent bg-accent-soft text-accent" : "border-ink-700 text-zinc-400 hover:text-white"
+                }`}
+              >
+                {l}
+              </button>
             ))}
           </div>
-        ) : (
-          <>
-            <motion.div
-              variants={stagger}
-              initial="hidden"
-              animate={hasMounted ? "visible" : "hidden"}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {projects.map((project) => (
-                <motion.div
-                  key={project.id}
-                  variants={cardAnimation}
-                  className="relative group bg-gray-800 rounded-xl p-6 h-64 flex flex-col justify-between transform transition-all hover:scale-105 hover:shadow-2xl"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-500 rounded-xl opacity-0 group-hover:opacity-20 transition-opacity" />
-                  
-                  <div>
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-semibold text-white">
-                        {project.name}
-                      </h3>
-                      <div className="flex items-center space-x-2">
-                        {project.homepage && (
-                          <a
-                            href={project.homepage}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-gray-400 hover:text-blue-400 transition-colors"
-                          >
-                            <FiExternalLink className="w-5 h-5" />
-                          </a>
-                        )}
-                        <a
-                          href={project.html_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-gray-400 hover:text-purple-400 transition-colors"
-                        >
-                          <FiGithub className="w-5 h-5" />
-                        </a>
-                      </div>
-                    </div>
+        </div>
 
-                    <p className="text-gray-400 text-sm mb-4 line-clamp-3">
-                      {project.description || "No description available"}
-                    </p>
-                  </div>
-
-                  <div className="mt-auto">
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {project.topics?.slice(0, 3).map((topic) => (
-                        <span
-                          key={topic}
-                          className="px-2 py-1 bg-gray-700 text-xs text-purple-300 rounded-full"
-                        >
-                          {topic}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="flex justify-between items-center text-sm text-gray-400">
-                      <div className="flex items-center space-x-2">
-                        <FiStar className="w-4 h-4" />
-                        <span>{project.stargazers_count}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <FiGitBranch className="w-4 h-4" />
-                        <span>{project.forks_count}</span>
-                      </div>
-                      <span className="text-purple-400">{project.language}</span>
-                    </div>
-                  </div>
-                </motion.div>
+        <div className="mt-10">
+          {status === "loading" && (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="card h-40 animate-pulse" />
               ))}
-            </motion.div>
+            </div>
+          )}
 
-            {hasMore && (
-              <div className="text-center mt-12">
-                <button
-                  onClick={() => setPage(prev => prev + 1)}
-                  className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold rounded-lg hover:shadow-xl transition-shadow"
-                >
-                  Load More Projects
-                </button>
-              </div>
-            )}
-          </>
-        )}
+          {status === "error" && (
+            <div className="card p-8 text-center">
+              <p className="text-zinc-300">Couldn&apos;t load repositories right now.</p>
+              <a href={profile.links.github} target="_blank" rel="noopener noreferrer" className="btn-ghost mt-6">
+                <FiGithub /> View on GitHub
+              </a>
+            </div>
+          )}
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center mt-12"
-        >
-          <a
-            href="https://github.com/huzaifayasin681"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold rounded-lg hover:shadow-xl transition-shadow"
-          >
-            <FiGithub className="w-5 h-5 mr-2" />
-            View All Projects on GitHub
-          </a>
-        </motion.div>
+          {status === "ready" && (
+            <>
+              <p className="mb-4 font-mono text-xs text-zinc-500">
+                {filtered.length} of {repos.length} repositories
+              </p>
+              <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {filtered.map((r) => (
+                  <li key={r.id}>
+                    <a
+                      href={r.homepage || r.html_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="card group flex h-full flex-col p-5"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <h2 className="break-all font-medium text-white">{r.name.replace(/[-_]/g, " ")}</h2>
+                        <FiArrowUpRight className="shrink-0 text-zinc-600 transition group-hover:text-accent" />
+                      </div>
+                      <p className="mt-2 line-clamp-3 flex-1 text-sm text-zinc-400">{r.description || "No description provided."}</p>
+                      <div className="mt-5 flex items-center gap-4 font-mono text-xs text-zinc-500">
+                        {r.language && (
+                          <span className="inline-flex items-center gap-1.5">
+                            <span className="h-2 w-2 rounded-full bg-accent" />
+                            {r.language}
+                          </span>
+                        )}
+                        {r.stargazers_count > 0 && (
+                          <span className="inline-flex items-center gap-1">
+                            <FiStar size={12} /> {r.stargazers_count}
+                          </span>
+                        )}
+                        <span className="ml-auto">{timeAgo(r.pushed_at)}</span>
+                      </div>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              {filtered.length === 0 && <p className="text-zinc-500">No repositories match your search.</p>}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </section>
   );
-};
-
-export default Projects;
+}
