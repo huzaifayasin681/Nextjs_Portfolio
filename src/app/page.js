@@ -1,15 +1,17 @@
-import HomeSection from "./components/HomeSection";
-import Services from "./components/ServicesSection";
-import Portfolio from "./components/PortfolioSection";
-import CallToAction from "./components/CallToAction";
+import Hero from "@/components/Hero";
+import About from "@/components/About";
+import Projects from "@/components/Projects";
+import Skills from "@/components/Skills";
+import Contact from "@/components/Contact";
 
 export default function Home() {
   return (
-    <div>
-      <HomeSection/>
-      <Services/>
-      <Portfolio/>
-      <CallToAction/>
-      </div>
+    <>
+      <Hero />
+      <About />
+      <Projects />
+      <Skills />
+      <Contact />
+    </>
   );
 }
